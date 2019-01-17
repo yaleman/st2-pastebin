@@ -4,12 +4,23 @@
 import traceback
 from json import JSONDecodeError
 import requests
+import socket
+from unittest.mock import patch
 
 from st2reactor.sensor.base import PollingSensor
 
 __all__ = ['PasteBinPoller',]
 
 SCRAPE_URL = 'https://scrape.pastebin.com/api_scraping.php'
+
+# monkeypatching requests to work with ipv4 or ipv6 specifically
+orig_getaddrinfo = socket.getaddrinfo
+def getaddrinfoIPv6(host, port, family=0, type=0, proto=0, flags=0):
+    return orig_getaddrinfo(host=host, port=port, family=socket.AF_INET6, type=type, proto=proto, flags=flags)
+
+def getaddrinfoIPv4(host, port, family=0, type=0, proto=0, flags=0):
+    return orig_getaddrinfo(host=host, port=port, family=socket.AF_INET, type=type, proto=proto, flags=flags)
+
 
 class PasteBinPoller(PollingSensor):
     """ regularly polls the pastebin scrape API endpoint and reports back new keys """
@@ -30,10 +41,23 @@ class PasteBinPoller(PollingSensor):
 
     def poll(self):
         """ does the polling action """
+        # check which IP version we should use, it could change and it doesn't hurt to do this.
+        #self._config['ipversion']
+
         try:
             # do the HTTP request
-            req = requests.get(self._url)
-            self._logger.debug("Doing the request to {}".format(self._url))
+            if self._config['ipversion'] == 6:
+                self._logging.debug("Querying with IPv6")
+                with patch('socket.getaddrinfo', side_effect=getaddrinfoIPv6):
+                    req = requests.get(self._url)
+                #print('ipv6: '+re.search(r'\+3>(.*?)</',r.content.decode('utf-8')).group(1))
+            else:
+                self._logging.debug("Querying API with IPv4")
+                with patch('socket.getaddrinfo', side_effect=getaddrinfoIPv4):
+                    req = requests.get(self._url)
+                #print('ipv4: '+re.search(r'\+3>(.*?)</',r.content.decode('utf-8')).group(1)
+            
+            #self._logger.debug("Doing the request to {}".format(self._url))
             if req and req.status_code == 200:
                 self._logger.debug("Got a response from the API")
                 try:
