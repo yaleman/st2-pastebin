@@ -7,8 +7,12 @@ entry_point: ""
 parameters:
   key:
     type: 'string'
-    description: 'the unique paste key of the item you want'
+    description: 'Unique paste key of the item you want'
     required: true
+  date:
+    type: 'string'
+    description: 'Timestamp in seconds since epoch of when the paste occurred - comes from the scrape API'
+    required: false
   url:
     immutable: true
     default: 'https://scrape.pastebin.com/api_scrape_item.php?i={{key}}'
