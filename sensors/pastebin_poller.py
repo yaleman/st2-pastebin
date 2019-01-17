@@ -2,7 +2,7 @@
     emits a trigger to say a new paste has occurred """
 
 import traceback
-
+import json
 import requests
 
 from st2reactor.sensor.base import PollingSensor
