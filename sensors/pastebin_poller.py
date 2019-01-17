@@ -51,3 +51,15 @@ class PasteBinPoller(PollingSensor):
         if hasattr(self._sensor_service, 'set_value'):
             self._sensor_service.set_value(name='last_time', value=last_time)
 
+
+    def cleanup(self):
+        pass
+
+    def add_trigger(self, trigger):
+        pass
+
+    def update_trigger(self, trigger):
+        pass
+
+    def remove_trigger(self, trigger):
+        pass
