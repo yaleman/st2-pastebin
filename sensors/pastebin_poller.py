@@ -4,7 +4,6 @@
 import traceback
 import requests
 import socket
-from unittest.mock import patch
 
 from st2reactor.sensor.base import PollingSensor
 
