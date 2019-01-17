@@ -1,7 +1,7 @@
 from st2reactor.sensor.base import PollingSensor
 
 import requests
-
+import traceback
 __all__ = [ 'PasteBinPoller', ]
 
 SCRAPE_URL = 'https://scrape.pastebin.com/api_scraping.php'
@@ -25,18 +25,21 @@ class PasteBinPoller(PollingSensor):
         try:
             # do the HTTP request
             req = requests.get("{}?limit={}".format(SCRAPE_URL, limit))
-
+            print("Doing the request")
             if req and req.status_code == 200:
+                print("Got a value")
                 # sort by timestamp, it comes in most-recent-first
                 data = sorted(req.json(), key=lambda k: k['date'])
                 for paste in data:
+                    print("time:{} key:{}".format(paste['date'], paste['key']))
                     if paste['date'] > self._get_last_time():
                         # this is the timestamp of the last processed paste
                         self._set_last_time(last_time=paste['date'])
                         # do the thing
                         self._sensor_service.dispatch(trigger=self._trigger_ref, payload={'key' : paste['key']})
-        except:
-            pass
+        except Exception as e:
+            print("Threw an error: {}".format(e))
+            print(traceback.format_exc())
         return
    
     def _get_last_time(self):
