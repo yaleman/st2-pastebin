@@ -11,13 +11,19 @@ __all__ = ['PasteBinPoller',]
 
 SCRAPE_URL = 'https://scrape.pastebin.com/api_scraping.php'
 
-# monkeypatching requests to work with ipv4 or ipv6 specifically
-orig_getaddrinfo = socket.getaddrinfo
 def getaddrinfoIPv6(host, port, family=0, type=0, proto=0, flags=0):
-    return orig_getaddrinfo(host=host, port=port, family=socket.AF_INET6, proto=proto, flags=flags)
+    return socket.getaddrinfo(host=host, port=port, family=socket.AF_INET6, proto=proto, flags=flags)
 
 def getaddrinfoIPv4(host, port, family=0, type=0, proto=0, flags=0):
-    return orig_getaddrinfo(host=host, port=port, family=socket.AF_INET, proto=proto, flags=flags)
+    return socket.getaddrinfo(host=host, port=port, family=socket.AF_INET, proto=proto, flags=flags)
+
+def request_get_versioned(url, ipversion):
+    # monkeypatching requests to work with ipv4 or ipv6 specifically
+    if ipversion == 6:
+        socket.getaddrinfo = getaddrinfoIPv6
+    else:
+        socket.getaddrinfo = getaddrinfoIPv4
+    return requests.get(url)
 
 
 class PasteBinPoller(PollingSensor):
@@ -39,27 +45,11 @@ class PasteBinPoller(PollingSensor):
 
     def poll(self):
         """ does the polling action """
-        # check which IP version we should use, it could change and it doesn't hurt to do this.
-        #self._config['ipversion']
-
         try:
             # do the HTTP request
-            if self._config['ipversion'] == 6:
-                self._logger.debug("Querying with IPv6")
-                #with patch('socket.getaddrinfo', side_effect=getaddrinfoIPv6):
-                socket.getaddrinfo = getaddrinfoIPv6
-                req = requests.get(self._url)
-                socket.getaddrinfo = orig_getaddrinfo
-                #print('ipv6: '+re.search(r'\+3>(.*?)</',r.content.decode('utf-8')).group(1))
-            else:
-                self._logger.debug("Querying API with IPv4")
-                socket.getaddrinfo = getaddrinfoIPv4
-                #with patch('socket.getaddrinfo', side_effect=getaddrinfoIPv4):
-                req = requests.get(self._url)
-                socket.getaddrinfo = orig_getaddrinfo
-                #print('ipv4: '+re.search(r'\+3>(.*?)</',r.content.decode('utf-8')).group(1)
+            self._logger.debug("Doing the request to {}".format(self._url))
+            req = request_get_versioned(self._url, self._config['ipversion'])
             
-            #self._logger.debug("Doing the request to {}".format(self._url))
             if req and req.status_code == 200:
                 self._logger.debug("Got a response from the API")
                 try:
