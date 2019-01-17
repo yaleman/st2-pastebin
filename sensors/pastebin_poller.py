@@ -46,6 +46,10 @@ class PasteBinPoller(PollingSensor):
                         # do the thing
                         payload = {'date' : paste['date'], 'key' : paste['key']}
                         self._sensor_service.dispatch(trigger=self._trigger_ref, payload=payload)
+                    else:
+                        self._logger.debug("Skipping paste {} {}".format(paste['key'], paste['date']))
+            else:
+                self._logger.debug("No response from the API (status_code: {})".format(req.status_code))
         except Exception as error_message:
             self._logger.debug("Threw an error: {}".format(error_message))
             self._logger.debug(traceback.format_exc())
