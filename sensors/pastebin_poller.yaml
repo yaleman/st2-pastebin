@@ -4,7 +4,8 @@ entry_point: "pastebin_poller.py"
 description: "Sensor that polls the Pastebin.com scrape API and returns un-seen paste IDs"
 poll_interval: 5
 trigger_types:
-   - name: "new_key"
+   - name: "new_paste"
      description: "identified a new unseen key"
      payload_info:
        - "key"
+       - "date"
