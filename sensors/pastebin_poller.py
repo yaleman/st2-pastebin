@@ -2,7 +2,6 @@
     emits a trigger to say a new paste has occurred """
 
 import traceback
-from json import JSONDecodeError
 import requests
 import socket
 from unittest.mock import patch
@@ -62,7 +61,7 @@ class PasteBinPoller(PollingSensor):
                 self._logger.debug("Got a response from the API")
                 try:
                     jsondata = req.json()
-                except JSONDecodeError:
+                except TypeError:
                     self._logger.debug("JSON Decode failed, stopping. Probably not running from a whitelisted IP")
                     return False
                 if "VISIT: https://pastebin.com/doc_scraping_api TO GET ACCESS!" in req.text:
