@@ -36,8 +36,16 @@ class PasteBinPoller(PollingSensor):
             self._logger.debug("Doing the request to {}".format(self._url))
             if req and req.status_code == 200:
                 self._logger.debug("Got a response from the API")
+                try:
+                    jsondata = req.json()
+                except json.JSONDecodeError:
+                    self._logger.debug("JSON Decode failed, stopping. Probably not running from a whitelisted IP")
+                    return False
+                if "VISIT: https://pastebin.com/doc_scraping_api TO GET ACCESS!" in req.text:
+                    self._logger.debug("Our source IP is not whitelisted, stoppping.")
+                    return False
                 # sort by timestamp, it comes in most-recent-first
-                data = sorted(req.json(), key=lambda k: k['date'])
+                data = sorted(jsondata, key=lambda k: k['date'])
                 for paste in data:
                     self._logger.debug("time:{} key:{}".format(paste['date'], paste['key']))
                     if paste['date'] > self._get_last_time():
