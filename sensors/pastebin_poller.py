@@ -1,7 +1,7 @@
 from st2reactor.sensor.base import Sensor
 
 
-class SampleSensor(Sensor):
+class PasteBinPoller(Sensor):
     """
     * self.sensor_service
         - provides utilities like

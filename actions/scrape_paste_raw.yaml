@@ -5,11 +5,11 @@ enabled: true
 description: "grabs raw item from the scrape API endpoint"
 entry_point: ""
 parameters:
-  paste_key:
+  key:
     type: 'string'
     description: 'the unique paste key of the item you want'
     required: true
   url:
     immutable: true
-    default: 'https://scrape.pastebin.com/api_scrape_item.php?i={{paste_key}}'
+    default: 'https://scrape.pastebin.com/api_scrape_item.php?i={{key}}'
 

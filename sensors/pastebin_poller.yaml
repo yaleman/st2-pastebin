@@ -1,0 +1,10 @@
+---
+class_name: "PasteBinPoller"
+entry_point: "pastebin_poller.py"
+description: "Sensor that polls the Pastebin.com scrape API and returns un-seen paste IDs"
+poll_interval: 30
+trigger_types:
+   - name: "new_key"
+     description: "identified a new unseen key"
+     payload_info:
+       - "key"
