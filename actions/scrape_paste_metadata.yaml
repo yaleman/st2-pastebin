@@ -1,0 +1,14 @@
+---
+name: "scrape_paste_metadata"
+runner_type: "http-request"
+enabled: true
+description: "grabs raw item from the scrape API endpoint"
+entry_point: ""
+parameters:
+    paste_key:
+        type: 'string'
+        decription: 'the unique paste key of the item you want'
+        required: true
+    url:
+         immutable: true
+        default: 'https://scrape.pastebin.com/api_scrape_item_meta.php?i={{paste_key}}'
