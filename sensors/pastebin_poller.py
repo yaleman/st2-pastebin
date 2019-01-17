@@ -14,10 +14,10 @@ SCRAPE_URL = 'https://scrape.pastebin.com/api_scraping.php'
 # monkeypatching requests to work with ipv4 or ipv6 specifically
 orig_getaddrinfo = socket.getaddrinfo
 def getaddrinfoIPv6(host, port, family=0, type=0, proto=0, flags=0):
-    return orig_getaddrinfo(host=host, port=port, family=socket.AF_INET6, type=type, proto=proto, flags=flags)
+    return orig_getaddrinfo(host=host, port=port, family=socket.AF_INET6, proto=proto, flags=flags)
 
 def getaddrinfoIPv4(host, port, family=0, type=0, proto=0, flags=0):
-    return orig_getaddrinfo(host=host, port=port, family=socket.AF_INET, type=type, proto=proto, flags=flags)
+    return orig_getaddrinfo(host=host, port=port, family=socket.AF_INET, proto=proto, flags=flags)
 
 
 class PasteBinPoller(PollingSensor):
