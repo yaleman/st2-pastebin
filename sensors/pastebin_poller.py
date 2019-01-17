@@ -16,15 +16,16 @@ class PasteBinPoller(PollingSensor):
         self._logger = self._sensor_service.get_logger(__name__)
 
     def setup(self):
-        # Setup stuff goes here. For example, you might establish connections
-        # to external system once and reuse it. This is called only once by the system.
-        pass
+        # Setup stuff goes here. This is called only once by the system.
+        self._last_time = None
+        limit = 50 # default, TODO: make this a config item
+        self._url = "{}?limit={}".format(SCRAPE_URL, limit)
 
     def poll(self):
-        limit = 50 # default, need to make this a config item
+        """ does the polling action """
         try:
             # do the HTTP request
-            req = requests.get("{}?limit={}".format(SCRAPE_URL, limit))
+            req = requests.get(self._url)
             print("Doing the request")
             if req and req.status_code == 200:
                 print("Got a value")
