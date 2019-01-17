@@ -23,10 +23,12 @@ class PasteBinPoller(PollingSensor):
     def poll(self):
         limit = 50 # default, need to make this a config item
         try:
+            # do the HTTP request
             req = requests.get("{}?limit={}".format(SCRAPE_URL, limit))
 
             if req and req.status_code == 200:
-                data = req.json()
+                # sort by timestamp, it comes in most-recent-first
+                data = sorted(req.json(), key=lambda k: k['date'])
                 for paste in data:
                     if paste['date'] > self._get_last_time():
                         # this is the timestamp of the last processed paste
@@ -39,12 +41,13 @@ class PasteBinPoller(PollingSensor):
    
     def _get_last_time(self):
         """ returns the last timestamp that was processed by the poller """
-        if not self._last_time and hasattr(self._sensor_service, 'get_value')):
+        if not self._last_time and hasattr(self._sensor_service, 'get_value'):
             self._last_time = self._sensor_service.get_value(name='last_time')
         return self._last_time
 
     def _set_last_time(self, last_time):
+        """ stores the last timestamp seen by the thing """
         self._last_time = last_time
         if hasattr(self._sensor_service, 'set_value'):
             self._sensor_service.set_value(name='last_time', value=last_time)
-            
+
