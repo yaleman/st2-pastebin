@@ -2,7 +2,7 @@
     emits a trigger to say a new paste has occurred """
 
 import traceback
-import json
+from json import JSONDecodeError
 import requests
 
 from st2reactor.sensor.base import PollingSensor
@@ -38,7 +38,7 @@ class PasteBinPoller(PollingSensor):
                 self._logger.debug("Got a response from the API")
                 try:
                     jsondata = req.json()
-                except json.JSONDecodeError:
+                except JSONDecodeError:
                     self._logger.debug("JSON Decode failed, stopping. Probably not running from a whitelisted IP")
                     return False
                 if "VISIT: https://pastebin.com/doc_scraping_api TO GET ACCESS!" in req.text:
