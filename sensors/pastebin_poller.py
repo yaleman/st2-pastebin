@@ -47,13 +47,17 @@ class PasteBinPoller(PollingSensor):
             # do the HTTP request
             if self._config['ipversion'] == 6:
                 self._logging.debug("Querying with IPv6")
-                with patch('socket.getaddrinfo', side_effect=getaddrinfoIPv6):
-                    req = requests.get(self._url)
+                #with patch('socket.getaddrinfo', side_effect=getaddrinfoIPv6):
+                socket.getaddrinfo = getaddrinfoIPv6
+                req = requests.get(self._url)
+                socket.getaddrinfo = orig_getaddrinfo
                 #print('ipv6: '+re.search(r'\+3>(.*?)</',r.content.decode('utf-8')).group(1))
             else:
                 self._logging.debug("Querying API with IPv4")
-                with patch('socket.getaddrinfo', side_effect=getaddrinfoIPv4):
-                    req = requests.get(self._url)
+                socket.getaddrinfo = getaddrinfoIPv4
+                #with patch('socket.getaddrinfo', side_effect=getaddrinfoIPv4):
+                req = requests.get(self._url)
+                socket.getaddrinfo = orig_getaddrinfo
                 #print('ipv4: '+re.search(r'\+3>(.*?)</',r.content.decode('utf-8')).group(1)
             
             #self._logger.debug("Doing the request to {}".format(self._url))
