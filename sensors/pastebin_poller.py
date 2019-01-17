@@ -1,53 +1,50 @@
-from st2reactor.sensor.base import Sensor
+from st2reactor.sensor.base import PollingSensor
 
+import requests
 
-class PasteBinPoller(Sensor):
-    """
-    * self.sensor_service
-        - provides utilities like
-            - get_logger() - returns logger instance specific to this sensor.
-            - dispatch() for dispatching triggers into the system.
-    * self._config
-        - contains parsed configuration that was specified as
-          config.yaml in the pack.
-    """
+__all__ = [ 'PasteBinPoller', ]
+
+SCRAPE_URL = 'https://scrape.pastebin.com/api_scraping.php'
+
+class PasteBinPoller(PollingSensor):
+    """ regularly polls the pastebin scrape API endpoint and reports back new keys """
+
+    def __init__(self, sensor_service, config=None, poll_interval=None):
+        """ sets up the thing """
+        super(PasteBinPoller, self).__init__(sensor_service=sensor_service, config=config, poll_interval=poll_interval)
+        self._trigger_ref = 'pastebin.scrape_paste_raw'
+        self._logger = self._sensor_service.get_logger(__name__)
 
     def setup(self):
         # Setup stuff goes here. For example, you might establish connections
         # to external system once and reuse it. This is called only once by the system.
         pass
 
-    def run(self):
-        # This is where the crux of the sensor work goes.
-        # This is called once by the system.
-        # (If you want to sleep for regular intervals and keep
-        # interacting with your external system, you'd inherit from PollingSensor.)
-        # For example, let's consider a simple flask app. You'd run the flask app here.
-        # You can dispatch triggers using sensor_service like so:
-        # self.sensor_service(trigger, payload, trace_tag)
-        #   # You can refer to the trigger as dict
-        #   # { "name": ${trigger_name}, "pack": ${trigger_pack} }
-        #   # or just simply by reference as string.
-        #   # i.e. dispatch(${trigger_pack}.${trigger_name}, payload)
-        #   # E.g.: dispatch('examples.foo_sensor', {'k1': 'stuff', 'k2': 'foo'})
-        #   # trace_tag is a tag you would like to associate with the dispatched TriggerInstance
-        #   # Typically the trace_tag is unique and a reference to an external event.
-        pass
+    def poll(self):
+        limit = 50 # default, need to make this a config item
+        try:
+            req = requests.get("{}?limit={}".format(SCRAPE_URL, limit))
 
-    def cleanup(self):
-        # This is called when the st2 system goes down. You can perform cleanup operations like
-        # closing the connections to external system here.
-        pass
+            if req and req.status_code == 200:
+                data = req.json()
+                for paste in data:
+                    if paste['date'] > self._get_last_time():
+                        # this is the timestamp of the last processed paste
+                        self._set_last_time(last_time=paste['date'])
+                        # do the thing
+                        self._sensor_service.dispatch(trigger=self._trigger_ref, payload={'key' : paste['key']})
+        except:
+            pass
+        return
+   
+    def _get_last_time(self):
+        """ returns the last timestamp that was processed by the poller """
+        if not self._last_time and hasattr(self._sensor_service, 'get_value')):
+            self._last_time = self._sensor_service.get_value(name='last_time')
+        return self._last_time
 
-    def add_trigger(self, trigger):
-        # This method is called when trigger is created
-        pass
-
-    def update_trigger(self, trigger):
-        # This method is called when trigger is updated
-        pass
-
-    def remove_trigger(self, trigger):
-        # This method is called when trigger is deleted
-        pass
-
+    def _set_last_time(self, last_time):
+        self._last_time = last_time
+        if hasattr(self._sensor_service, 'set_value'):
+            self._sensor_service.set_value(name='last_time', value=last_time)
+            
