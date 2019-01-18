@@ -47,6 +47,7 @@ class PasteBinPoller(PollingSensor):
     def setup(self):
         """ Setup stuff goes here. This is called only once by the system."""
         self.set_poll_interval(self._config['poll_interval'])
+        self.logger.debug('set poll interval to {}'.format(config['poll_interval']))
         pass
 
     def poll(self):
@@ -124,6 +125,9 @@ class PasteBinPoller(PollingSensor):
 
     def update_trigger(self, trigger):
         """ run when there's a change to the trigger """
+        self.set_poll_interval(self._config['poll_interval'])
+        self.logger.debug('set poll interval to {}'.format(config['poll_interval']))
+        
         pass
 
     def remove_trigger(self, trigger):
