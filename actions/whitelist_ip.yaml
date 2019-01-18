@@ -12,14 +12,6 @@ parameters:
   url:
     immutable: true
     default: 'https://pastebin.com/doc_scraping_api.php'
-  username:
-    type: 'string'
-    description: 'Pastebin username'
-    required: true
-  password:
-    type: 'string'
-    description: 'Pastebin password'
-    required: true
   data:
     immutable: true
     type: 'string'
