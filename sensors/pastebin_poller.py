@@ -46,6 +46,7 @@ class PasteBinPoller(PollingSensor):
 
     def setup(self):
         """ Setup stuff goes here. This is called only once by the system."""
+        self.set_poll_interval(self._config['poll_interval'])
         pass
 
     def poll(self):
