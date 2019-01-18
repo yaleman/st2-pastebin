@@ -62,6 +62,10 @@ class PasteBinPoller(PollingSensor):
                     'syntax' : str,
                 }
         """
+        self.set_poll_interval(self._config['poll_interval'])
+        self._logger.debug('set poll interval to {}'.format(self._config['poll_interval']))
+        
+        
         try:
             # do the HTTP request
             self._logger.debug("Doing the request to {}".format(self._url))
@@ -124,11 +128,7 @@ class PasteBinPoller(PollingSensor):
         pass
 
     def update_trigger(self, trigger):
-        """ run when there's a change to the trigger """
-        self.set_poll_interval(self._config['poll_interval'])
-        self._logger.debug('set poll interval to {}'.format(self._config['poll_interval']))
-        
-        pass
+        """ run when there's a change to the trigger """pass
 
     def remove_trigger(self, trigger):
         """ run when the trigger is removed """
