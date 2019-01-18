@@ -5,9 +5,13 @@
 * Routinely polls the [Pastebin scraping API endpoint](https://pastebin.com/doc_scraping_api) looking for new uploads.
 * It uses the kv store to keep a record of the most recently handled paste so you don't keep hitting old ones
 * Emits `pastebin.new_paste`
-    * Payload is `key` and `date`
+    * Payload is nearly every field listed on the above URL, the main ones you'll use are:
     * `key` is the 8 character string which refers to individual pastes
     * `date` is a seconds-since-unix-epoch-time timestamp of the paste
+    * `title` of the paste
+    * `syntax`
+    * `size` of the paste
+    * `user` who pasted it
 
 **Action pastebin.scrape_paste_raw**
 
