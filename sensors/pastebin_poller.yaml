@@ -2,7 +2,7 @@
 class_name: PasteBinPoller
 description: "Sensor that polls the Pastebin.com scrape API and returns un-seen paste IDs"
 entry_point: pastebin_poller.py
-poll_interval: {{config_context.poll_interval}}
+poll_interval: "{{config_context.poll_interval}}"
 trigger_types: 
   - 
     description: "identified a new unseen key"
