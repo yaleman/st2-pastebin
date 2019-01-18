@@ -1,0 +1,33 @@
+---
+name: "whitelist_ip"
+runner_type: "local-shell-cmd"
+enabled: true
+description: "Attempts to whitelist an IP in the Pastebin Scraping API"
+entry_point: ""
+parameters:
+  ip:
+    type: 'string'
+    description: 'IP Address to whitelist'
+    required: true
+  url:
+    immutable: true
+    default: 'https://pastebin.com/doc_scraping_api.php'
+  username:
+    type: 'string'
+    description: 'Pastebin username'
+    required: true
+  password:
+    type: 'string'
+    description: 'Pastebin password'
+    required: true
+  data:
+    immutable: true
+    type: 'string'
+    default: '--data "submit_hidden=submit_hidden&whitelist_ip={{ip}}&submit=Whitelist+My+IP"'
+  auth:
+    immutable: true
+    type: 'string'
+    default: '-u "{{config_context.pastebin_username}}:{{config_context.pastebin_password}}"'
+  cmd:
+    immutable: true
+    default: 'curl "{{url}}" -s -H "Referer: https://pastebin.com/doc_scraping_api" {{auth}} -H "Content-Type: application/x-www-form-urlencoded" {{data}}'

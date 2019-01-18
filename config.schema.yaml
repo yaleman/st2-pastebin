@@ -5,3 +5,13 @@ ipversion:
   required: true
   secret: false
   default: 4
+pastebin_username:
+  description: Pastebin.com username
+  type: string
+  required: false
+  secret: false
+pastebin_password:
+  type: string
+  description: Pastebin.com password
+  secret: true
+  required: false
