@@ -14,4 +14,4 @@ parameters:
     default: 'https://scrape.pastebin.com/api_scrape_item.php?i={{key}}'
   cmd:
     immutable: true
-    default: 'curl  -{{ipversion}} -s {{url}}'
+    default: 'curl  -{{config_context.ipversion}} -s {{url}}'
