@@ -2,7 +2,7 @@
 name: "whitelist_ip"
 runner_type: "local-shell-cmd"
 enabled: true
-description: "Attempts to whitelist an IP in the Pastebin Scraping API"
+description: "Attempts to whitelist an IP in the Pastebin Scraping API - doesn't work yet"
 entry_point: ""
 parameters:
   ip:
@@ -22,4 +22,4 @@ parameters:
     default: '-u "{{config_context.pastebin_username}}:{{config_context.pastebin_password}}"'
   cmd:
     immutable: true
-    default: 'curl "{{url}}" -s -H "Referer: https://pastebin.com/doc_scraping_api" {{auth}} -H "Content-Type: application/x-www-form-urlencoded" {{data}}'
+    default: 'curl "{{url}}" -vvv -H "Referer: https://pastebin.com/doc_scraping_api" {{auth}} -H "Content-Type: application/x-www-form-urlencoded" {{data}}'
