@@ -1,6 +1,6 @@
 ---
 name: "scrape_paste_metadata"
-runner_type: "remote-shell-cmd"
+runner_type: "local-shell-cmd"
 enabled: true
 description: "grabs raw item from the scrape API endpoint"
 entry_point: ""
