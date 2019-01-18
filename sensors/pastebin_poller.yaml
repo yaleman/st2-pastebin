@@ -13,3 +13,11 @@ trigger_types:
            type: "string"
          date:
            type: "integer"
+         user:
+           type: "string"
+         title:
+           type: "string"
+         size:
+           type: "integer"
+         syntax:
+           type: "string"

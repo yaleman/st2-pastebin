@@ -55,6 +55,10 @@ class PasteBinPoller(PollingSensor):
                 {
                     'date' : int,
                     'key' : str,
+                    'title' : str,
+                    'user' : str,
+                    'size' : int,
+                    'syntax' : str,
                 }
         """
         try:
@@ -80,7 +84,13 @@ class PasteBinPoller(PollingSensor):
                         # this is the timestamp of the last processed paste
                         self._set_last_time(last_time=paste['date'])
                         # do the thing
-                        payload = {'date' : int(paste['date']), 'key' : paste['key']}
+                        payload = {'date' : int(paste['date']), 
+                                    'key' : paste['key'],
+                                    'size' : int(paste['size']),
+                                    'user' : paste['user'],
+                                    'title' : paste['title'],
+                                    'syntax' : paste['syntax'],
+                                    }
                         self._sensor_service.dispatch(trigger=self._trigger_ref, payload=payload)
                     else:
                         self._logger.debug("Skipping paste {} {}".format(paste['key'], paste['date']))
