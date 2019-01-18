@@ -46,7 +46,13 @@ class PasteBinPoller(PollingSensor):
         pass
 
     def poll(self):
-        """ does the polling action """
+        """ does the polling action 
+            if it finds a "new" paste, emits a payload:
+                { 
+                    'date' : int,
+                    'key' : str,
+                }
+        """
         try:
             # do the HTTP request
             self._logger.debug("Doing the request to {}".format(self._url))
@@ -70,7 +76,7 @@ class PasteBinPoller(PollingSensor):
                         # this is the timestamp of the last processed paste
                         self._set_last_time(last_time=paste['date'])
                         # do the thing
-                        payload = {'date' : paste['date'], 'key' : paste['key']}
+                        payload = {'date' : int(paste['date']), 'key' : paste['key']}
                         self._sensor_service.dispatch(trigger=self._trigger_ref, payload=payload)
                     else:
                         self._logger.debug("Skipping paste {} {}".format(paste['key'], paste['date']))
