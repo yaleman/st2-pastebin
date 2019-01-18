@@ -14,11 +14,11 @@ SCRAPE_URL = 'https://scrape.pastebin.com/api_scraping.php'
 
 OLD_GETADDRINFO = socket.getaddrinfo
 
-def getaddrinfoIPv6(host, port, proto=0, flags=0, **args):
+def getaddrinfoIPv6(host, port, proto=0, flags=0, *args):
     """ monkeypatched getaddrinfo to force IPv6 """
     return OLD_GETADDRINFO(host=host, port=port, family=socket.AF_INET6, proto=proto, flags=flags)
 
-def getaddrinfoIPv4(host, port, proto=0, flags=0, **args):
+def getaddrinfoIPv4(host, port, proto=0, flags=0, *args):
     """ monkeypatched getaddrinfo to force IPv4 """
     return OLD_GETADDRINFO(host=host, port=port, family=socket.AF_INET, proto=proto, flags=flags)
 
