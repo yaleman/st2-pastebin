@@ -18,7 +18,7 @@ def getaddrinfoIPv6(host, port, family=0, type=0, proto=0, flags=0):
     """ monkeypatched getaddrinfo to force IPv6 """
     return old_getaddrinfo(host=host, port=port, family=socket.AF_INET6, proto=proto, flags=flags)
 
-def getaddrinfoIPv4(host, port, family=0, type=0, proto=0, flags=0, *args):
+def getaddrinfoIPv4(host, port, family=0, type=0, proto=0, flags=0):
     """ monkeypatched getaddrinfo to force IPv4 """
     return old_getaddrinfo(host=host, port=port, family=socket.AF_INET, proto=proto, flags=flags)
 
@@ -48,7 +48,6 @@ class PasteBinPoller(PollingSensor):
         """ Setup stuff goes here. This is called only once by the system."""
         self.set_poll_interval(self._config['poll_interval'])
         self._logger.debug('set poll interval to {}'.format(self._config['poll_interval']))
-        pass
 
     def poll(self):
         """ does the polling action
@@ -128,7 +127,8 @@ class PasteBinPoller(PollingSensor):
         pass
 
     def update_trigger(self, trigger):
-        """ run when there's a change to the trigger """pass
+        """ run when there's a change to the trigger """
+        pass
 
     def remove_trigger(self, trigger):
         """ run when the trigger is removed """

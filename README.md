@@ -28,7 +28,7 @@ Give it the `key` and it'll grab the metadata of the paste
 3. Set the configuration items:
     * If your source IP is IPv4 or IPv6, set the `ipversion` value to the integer 4 or 6. This works around the fact that Pastebin is available on dual stack, but you can only whitelist one IP.
     * `poll_maxresults` can limit incoming bandwidth by requesting less items.
-    * `poll_interval` is the number of seconds between polls.
+    * `poll_interval` is the number of seconds between polls - this will update every poll cycle if you change it
 4. Configure a rule that uses the sensor/actions
 
 ## Example rule
