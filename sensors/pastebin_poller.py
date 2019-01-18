@@ -2,8 +2,9 @@
     emits a trigger to say a new paste has occurred """
 
 import traceback
-import requests
 import socket
+
+import requests
 
 from st2reactor.sensor.base import PollingSensor
 
@@ -11,15 +12,18 @@ __all__ = ['PasteBinPoller',]
 
 SCRAPE_URL = 'https://scrape.pastebin.com/api_scraping.php'
 
-old_getaddrinfo = socket.getaddrinfo
+OLD_GETADDRINFO = socket.getaddrinfo
 
-def getaddrinfoIPv6(host, port, family=0, type=0, proto=0, flags=0):
-    return old_getaddrinfo(host=host, port=port, family=socket.AF_INET6, proto=proto, flags=flags)
+def getaddrinfoIPv6(host, port, proto=0, flags=0, **args):
+    """ monkeypatched getaddrinfo to force IPv6 """
+    return OLD_GETADDRINFO(host=host, port=port, family=socket.AF_INET6, proto=proto, flags=flags)
 
-def getaddrinfoIPv4(host, port, family=0, type=0, proto=0, flags=0):
-    return old_getaddrinfo(host=host, port=port, family=socket.AF_INET, proto=proto, flags=flags)
+def getaddrinfoIPv4(host, port, proto=0, flags=0, **args):
+    """ monkeypatched getaddrinfo to force IPv4 """
+    return OLD_GETADDRINFO(host=host, port=port, family=socket.AF_INET, proto=proto, flags=flags)
 
 def request_get_versioned(url, ipversion):
+    """ does a request with different versions of socket.getaddrinfo - forces IPv4 or IPv6 """
     # monkeypatching requests to work with ipv4 or ipv6 specifically
     if ipversion == 6:
         socket.getaddrinfo = getaddrinfoIPv6
@@ -46,9 +50,9 @@ class PasteBinPoller(PollingSensor):
         pass
 
     def poll(self):
-        """ does the polling action 
+        """ does the polling action
             if it finds a "new" paste, emits a payload:
-                { 
+                {
                     'date' : int,
                     'key' : str,
                 }
@@ -57,17 +61,17 @@ class PasteBinPoller(PollingSensor):
             # do the HTTP request
             self._logger.debug("Doing the request to {}".format(self._url))
             req = request_get_versioned(self._url, self._config['ipversion'])
-            
+
             if req and req.status_code == 200:
                 self._logger.debug("Got a response from the API")
                 try:
                     jsondata = req.json()
                 except TypeError:
                     self._logger.debug("JSON Decode failed, stopping. Probably not running from a whitelisted IP")
-                    return False
+                    return
                 if "VISIT: https://pastebin.com/doc_scraping_api TO GET ACCESS!" in req.text:
                     self._logger.debug("Our source IP is not whitelisted, stoppping.")
-                    return False
+                    return
                 # sort by timestamp, it comes in most-recent-first
                 data = sorted(jsondata, key=lambda k: k['date'])
                 for paste in data:
