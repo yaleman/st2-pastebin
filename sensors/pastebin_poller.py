@@ -12,15 +12,15 @@ __all__ = ['PasteBinPoller',]
 
 SCRAPE_URL = 'https://scrape.pastebin.com/api_scraping.php'
 
-OLD_GETADDRINFO = socket.getaddrinfo
+old_getaddrinfo = socket.getaddrinfo
 
-def getaddrinfoIPv6(host, port, proto=0, flags=0, *args):
+def getaddrinfoIPv6(host, port, family=0, type=0, proto=0, flags=0):
     """ monkeypatched getaddrinfo to force IPv6 """
-    return OLD_GETADDRINFO(host=host, port=port, family=socket.AF_INET6, proto=proto, flags=flags)
+    return old_getaddrinfo(host=host, port=port, family=socket.AF_INET6, proto=proto, flags=flags)
 
-def getaddrinfoIPv4(host, port, proto=0, flags=0, *args):
+def getaddrinfoIPv4(host, port, family=0, type=0, proto=0, flags=0, *args):
     """ monkeypatched getaddrinfo to force IPv4 """
-    return OLD_GETADDRINFO(host=host, port=port, family=socket.AF_INET, proto=proto, flags=flags)
+    return old_getaddrinfo(host=host, port=port, family=socket.AF_INET, proto=proto, flags=flags)
 
 def request_get_versioned(url, ipversion):
     """ does a request with different versions of socket.getaddrinfo - forces IPv4 or IPv6 """
