@@ -6,6 +6,10 @@ poll_interval: 5
 trigger_types:
    - name: "new_paste"
      description: "identified a new unseen key"
-     payload_info:
-       - "key"
-       - "date"
+     payload_schema:
+       type: "object"
+       properties:
+         key:
+           type: "string"
+         date:
+           type: "integer"
