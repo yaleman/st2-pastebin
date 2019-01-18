@@ -1,6 +1,6 @@
 ---
 name: "scrape_paste_metadata"
-runner_type: "http-request"
+runner_type: "remote-shell-cmd"
 enabled: true
 description: "grabs raw item from the scrape API endpoint"
 entry_point: ""
@@ -12,3 +12,6 @@ parameters:
   url:
     immutable: true
     default: 'https://scrape.pastebin.com/api_scrape_item_meta.php?i={{key}}'
+  cmd:
+    immutable: true
+    default: 'curl  -{{ipversion}} -s {{url}}'
