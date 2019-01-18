@@ -4,7 +4,7 @@ This is definitely not something you want to use in production without checking 
 
 There's a few main elements to it:
 
-## Polling Sensor `pastebin.PasteBinPoller`
+### Polling Sensor pastebin.PasteBinPoller
 
 * Routinely polls the [Pastebin scraping API endpoint](https://pastebin.com/doc_scraping_api) looking for new uploads.
 * It uses the kv store to keep a record of the most recently handled paste so you don't keep hitting old ones
@@ -13,20 +13,25 @@ There's a few main elements to it:
     * `key` is the 8 character string which refers to individual pastes
     * `date` is a seconds-since-unix-epoch-time timestamp of the paste
 
-## Action `pastebin.scrape_paste_raw`
+### Action pastebin.scrape_paste_raw
 
 Give it the `key` and it'll grab the raw text of the paste
 
-## Action `pastebin.scrape_paste_metadata`
+### Action pastebin.scrape_paste_metadata
 
 Give it the `key` and it'll grab the metadata of the paste
-
 
 ## Usage
 
 1. [Get a pastebin pro account](https://pastebin.com/pro) and whitelist your IP address [on the scraping API page](https://pastebin.com/doc_scraping_api).
 2. Install the pack: `st2 pack install https://bitbucket.org/yaleman/st2-pastebin`
-3. Configure a rule that uses the sensor/actions
+3. Depending on whether your whitelisted IP is IPv4 or IPv6, set the "ipversion" configuration item to the integer 4 or 6. Thi s works around the fact that Pastebin is available on dual stack, but you can only whitelist one IP.
+4. Configure a rule that uses the sensor/actions
 
+## Example rule
 
+Trigger type: patebin.new_paste
+Action ref: pastebin.scrape_paste_raw
+Action key: {{trigger.key}} 
 
+This'll grab every new paste and then the contents of it. It's a super simple example which shouldn't be used alone, but could be used for an [ActionChain](https://docs.stackstorm.com/actionchain.html) workflow to filter contents and generate alerts.
