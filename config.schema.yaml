@@ -5,3 +5,11 @@ ipversion:
   required: true
   secret: false
   default: 4
+poll_interval:
+  description: "Seconds between polling the scrape API"
+  type: "integer"
+  default: 60
+poll_maxresults:
+  description: "Maximum results in a poll result - API limit is 250"
+  type: "integer"
+  default: 60

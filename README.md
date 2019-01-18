@@ -25,7 +25,10 @@ Give it the `key` and it'll grab the metadata of the paste
 
 1. [Get a pastebin pro account](https://pastebin.com/pro) and whitelist your IP address [on the scraping API page](https://pastebin.com/doc_scraping_api).
 2. Install the pack: `st2 pack install https://bitbucket.org/yaleman/st2-pastebin`
-3. Depending on whether your whitelisted IP is IPv4 or IPv6, set the "ipversion" configuration item to the integer 4 or 6. Thi s works around the fact that Pastebin is available on dual stack, but you can only whitelist one IP.
+3. Set the configuration items:
+    * If your source IP is IPv4 or IPv6, set the `ipversion` value to the integer 4 or 6. This works around the fact that Pastebin is available on dual stack, but you can only whitelist one IP.
+    * `poll_maxresults` can limit incoming bandwidth by requesting less items.
+    * `poll_interval` is the number of seconds between polls.
 4. Configure a rule that uses the sensor/actions
 
 ## Example rule

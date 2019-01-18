@@ -42,8 +42,7 @@ class PasteBinPoller(PollingSensor):
         self._trigger_ref = 'pastebin.new_paste'
         self._logger = self._sensor_service.get_logger(__name__)
         self._last_time = None
-        limit = 50 # default, TODO: make this a config item
-        self._url = "{}?limit={}".format(SCRAPE_URL, limit)
+        self._url = "{}?limit={}".format(SCRAPE_URL, self._config['poll_maxresults'])
 
     def setup(self):
         """ Setup stuff goes here. This is called only once by the system."""
