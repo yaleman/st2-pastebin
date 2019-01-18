@@ -11,11 +11,13 @@ __all__ = ['PasteBinPoller',]
 
 SCRAPE_URL = 'https://scrape.pastebin.com/api_scraping.php'
 
+old_getaddrinfo = socket.getaddrinfo
+
 def getaddrinfoIPv6(host, port, family=0, type=0, proto=0, flags=0):
-    return socket.getaddrinfo(host=host, port=port, family=socket.AF_INET6, proto=proto, flags=flags)
+    return old_getaddrinfo(host=host, port=port, family=socket.AF_INET6, proto=proto, flags=flags)
 
 def getaddrinfoIPv4(host, port, family=0, type=0, proto=0, flags=0):
-    return socket.getaddrinfo(host=host, port=port, family=socket.AF_INET, proto=proto, flags=flags)
+    return old_getaddrinfo(host=host, port=port, family=socket.AF_INET, proto=proto, flags=flags)
 
 def request_get_versioned(url, ipversion):
     # monkeypatching requests to work with ipv4 or ipv6 specifically
