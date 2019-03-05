@@ -36,11 +36,11 @@ class ScrapePasteRaw(Action):
         """ uploads a file from the local disk """
         try:
             # do the HTTP request
-            self._logger.debug("Doing the request to {}".format(self._url))
+            self.logger.debug("Doing the request to {}".format(self._url))
             req = request_get_versioned(URL.format(key), self._config['ipversion'])
 
             if req and not req.raise_for_status():
-                self._logger.debug("Got a response from the API")
+                self.logger.debug("Got a response from the API")
                 
                 data = str(req.text())
                 
@@ -49,6 +49,6 @@ class ScrapePasteRaw(Action):
             else:
                 return (False, "No response from the API (status_code: {})".format(req.status_code))
         except Exception as error_message:
-            self._logger.debug("Threw an error: {}".format(error_message))
-            self._logger.debug(traceback.format_exc())
+            self.logger.debug("Threw an error: {}".format(error_message))
+            self.logger.debug(traceback.format_exc())
         return (True, data)
