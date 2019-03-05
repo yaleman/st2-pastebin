@@ -39,11 +39,11 @@ class PasteBinPoller(PollingSensor):
         super(PasteBinPoller, self).__init__(sensor_service=sensor_service,
                                              config=config, 
                                              poll_interval=poll_interval)
-        #self._trigger_ref = 'pastebin.new_paste'
+        self._trigger_ref = 'pastebin.new_paste'
         self._logger = self._sensor_service.get_logger(__name__)
         self._logger.debug("PastebinPoller.__init__() start")
         #self._last_time = self._get_last_time()
-        #self._url = "{}?limit={}".format(SCRAPE_URL, self._config['poll_maxresults'])
+        self._url = "{}?limit={}".format(SCRAPE_URL, self._config['poll_maxresults'])
         self._logger.debug("PastebinPoller.__init__() done")
 
 
@@ -74,13 +74,12 @@ class PasteBinPoller(PollingSensor):
             #self._logger.debug('set poll interval to {}'.format(self._config['poll_interval']))
             
             
-            #try:
-                # do the HTTP request
-            #    self._logger.debug("Doing the request to {}".format(self._url))
-            #    req = request_get_versioned(self._url, self._config['ipversion'])
+            # do the HTTP request
+            self._logger.debug("Doing the request to {}".format(self._url))
+            req = request_get_versioned(self._url, self._config['ipversion'])
 
-            #    if req and not req.raise_for_status():
-            #        self._logger.debug("Got a response from the API")
+            if req and not req.raise_for_status():
+                self._logger.debug("Got a response from the API")
             #        try:
             #            jsondata = req.json()
             #        except TypeError:
