@@ -43,7 +43,7 @@ class ScrapePasteRaw(Action):
             if req and not req.raise_for_status():
                 self.logger.debug("Got a response from the API")
                 
-                data = str(req.text())
+                data = str(req.text)
                 
                 if "VISIT: https://pastebin.com/doc_scraping_api TO GET ACCESS!" in data:
                     return (False,"Our source IP is not whitelisted.")
