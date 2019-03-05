@@ -33,6 +33,23 @@ def request_get_versioned(url, ipversion):
     socketgetaddrinfo = old_getaddrinfo
     return req
 
+import socket
+import requests.packages.urllib3.util.connection as urllib3_cn
+
+
+  def allowed_gai_family():
+    """
+    fix from https://stackoverflow.com/questions/33046733/force-requests-to-use-ipv4-ipv6/46972341#46972341
+    relates to https://github.com/shazow/urllib3/blob/master/urllib3/util/connection.py
+    """
+    #family = socket.AF_INET
+    #if urllib3_cn.HAS_IPV6:
+    #    family = socket.AF_INET6 # force ipv6 only if it is available
+    return socket.AF_INET
+    return family
+
+urllib3_cn.allowed_gai_family = allowed_gai_family
+
 class PasteBinPoller(PollingSensor):
     """ regularly polls the pastebin scrape API endpoint and reports back new keys """
 
@@ -78,7 +95,8 @@ class PasteBinPoller(PollingSensor):
             
             # do the HTTP request
             self._logger.debug("Doing the request to {}".format(self._url))
-            req = request_get_versioned(self._url, self._config['ipversion'])
+            #req = request_get_versioned(self._url, self._config['ipversion'])
+            req = requests_get(self._url)
 
             if req and not req.raise_for_status():
                 self._logger.debug("Got a response from the API")
