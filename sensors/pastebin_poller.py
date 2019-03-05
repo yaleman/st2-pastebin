@@ -133,16 +133,20 @@ class PasteBinPoller(PollingSensor):
 
     def cleanup(self):
         """ cleanup handler """
+        self._logger.debug("PastebinPoller.cleanup() noop")
         pass
 
     def add_trigger(self, trigger):
         """ run when the trigger is added to the system """
+        self._logger.debug("PastebinPoller.add_trigger({}) noop".format(trigger))
         pass
 
     def update_trigger(self, trigger):
         """ run when there's a change to the trigger """
+        self._logger.debug("PastebinPoller.update_trigger({}) noop".format(trigger))
         pass
 
     def remove_trigger(self, trigger):
         """ run when the trigger is removed """
+        self._logger.debug("PastebinPoller.remove_trigger({}) noop".format(trigger))
         pass
