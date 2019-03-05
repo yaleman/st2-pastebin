@@ -1,10 +1,10 @@
 """ does a regular poll of the pastebin scrape API to get new pastes,
     emits a trigger to say a new paste has occurred """
 
-import traceback
+from traceback import format_exc
 import socket
 
-import requests
+from requests import get as requests_get
 
 from st2reactor.sensor.base import PollingSensor
 
@@ -29,7 +29,7 @@ def request_get_versioned(url, ipversion):
         socket.getaddrinfo = getaddrinfoIPv6
     else:
         socket.getaddrinfo = getaddrinfoIPv4
-    return requests.get(url)
+    return requests_get(url)
 
 class PasteBinPoller(PollingSensor):
     """ regularly polls the pastebin scrape API endpoint and reports back new keys """
@@ -37,8 +37,9 @@ class PasteBinPoller(PollingSensor):
     def __init__(self, sensor_service, config=None, poll_interval=None):
         """ sets up the thing """
         super(PasteBinPoller, self).__init__(sensor_service=sensor_service,
-                                             config=config, poll_interval=poll_interval)
-        self._trigger_ref = 'pastebin.new_paste'
+                                             config=config, 
+                                             poll_interval=poll_interval)
+        #self._trigger_ref = 'pastebin.new_paste'
         self._logger = self._sensor_service.get_logger(__name__)
         self._logger.debug("PastebinPoller.__init__() start")
         #self._last_time = self._get_last_time()
@@ -65,54 +66,53 @@ class PasteBinPoller(PollingSensor):
                     'syntax' : str,
                 }
         """
-        self._logger.debug("PastebinPoller.poll() start")
-        #self.set_poll_interval(self._config['poll_interval'])
-        #self._logger.debug('set poll interval to {}'.format(self._config['poll_interval']))
-        
-        
-        #try:
-            # do the HTTP request
-        #    self._logger.debug("Doing the request to {}".format(self._url))
-        #    req = request_get_versioned(self._url, self._config['ipversion'])
+        try:
+            self._logger.debug("PastebinPoller.poll() start")
+            #self.set_poll_interval(self._config['poll_interval'])
+            #self._logger.debug('set poll interval to {}'.format(self._config['poll_interval']))
+            
+            
+            #try:
+                # do the HTTP request
+            #    self._logger.debug("Doing the request to {}".format(self._url))
+            #    req = request_get_versioned(self._url, self._config['ipversion'])
 
-        #    if req and not req.raise_for_status():
-        #        self._logger.debug("Got a response from the API")
-        #        try:
-        #            jsondata = req.json()
-        #        except TypeError:
-        #            self._logger.debug("JSON Decode failed, stopping. Probably not running from a whitelisted IP")
-        #            return
-        #        if "VISIT: https://pastebin.com/doc_scraping_api TO GET ACCESS!" in req.text:
-        #            self._logger.debug("Our source IP is not whitelisted, stoppping.")
-        #            return
-        #        # sort by timestamp, it comes in most-recent-first
-        #        data = sorted(jsondata, key=lambda k: k['date'])
-        #        for paste in data:
-        #            self._logger.debug("PastebinPoller found paste - time:{} key:{}".format(paste['date'], paste['key']))
-        #            if paste['date'] > self._get_last_time():
-        #                # this is the timestamp of the last processed paste
-        #                self._set_last_time(last_time=paste['date'])
-        #                # do the thing
-        #                payload = {'date' : int(paste['date']), 
-        #                            'key' : paste['key'],
-        #                            'size' : int(paste['size']),
-        #                            'user' : paste['user'],
-        #                            'title' : paste['title'],
-        #                            'syntax' : paste['syntax'],
-        #                            }
-        #                self._logger.debug("Trigger running...")
-        #                self._sensor_service.dispatch(trigger=self._trigger_ref, payload=payload)
-        #                self._logger.debug("Trigger done.")
-        #            else:
-        #                self._logger.debug("Skipping paste {} {}".format(paste['key'], paste['date']))
-        #    else:
-        #        self._logger.debug("No response from the API (status_code: {})".format(req.status_code))
-        #except Exception as error_message:
-        #    self._logger.debug("Threw an error: {}".format(error_message))
-        #    self._logger.debug(traceback.format_exc())
+            #    if req and not req.raise_for_status():
+            #        self._logger.debug("Got a response from the API")
+            #        try:
+            #            jsondata = req.json()
+            #        except TypeError:
+            #            self._logger.debug("JSON Decode failed, stopping. Probably not running from a whitelisted IP")
+            #            return
+            #        if "VISIT: https://pastebin.com/doc_scraping_api TO GET ACCESS!" in req.text:
+            #            self._logger.debug("Our source IP is not whitelisted, stoppping.")
+            #            return
+            #        # sort by timestamp, it comes in most-recent-first
+            #        data = sorted(jsondata, key=lambda k: k['date'])
+            #        for paste in data:
+            #            self._logger.debug("PastebinPoller found paste - time:{} key:{}".format(paste['date'], paste['key']))
+            #            if paste['date'] > self._get_last_time():
+            #                # this is the timestamp of the last processed paste
+            #                self._set_last_time(last_time=paste['date'])
+            #                # do the thing
+            #                payload = {'date' : int(paste['date']), 
+            #                            'key' : paste['key'],
+            #                            'size' : int(paste['size']),
+            #                            'user' : paste['user'],
+            #                            'title' : paste['title'],
+            #                            'syntax' : paste['syntax'],
+            #                            }
+            #                self._logger.debug("Trigger running...")
+            #                self._sensor_service.dispatch(trigger=self._trigger_ref, payload=payload)
+            #                self._logger.debug("Trigger done.")
+            #            else:
+            #                self._logger.debug("Skipping paste {} {}".format(paste['key'], paste['date']))
+            #    else:
+            #        self._logger.debug("No response from the API (status_code: {})".format(req.status_code))
+        except Exception as error_message:
+                self._logger.debug("Threw an error: {}".format(error_message))
+                self._logger.debug(format_exc())
         self._logger.debug("PastebinPoller.poll() end")
-
-        return
 
     def _get_last_time(self):
         """ returns the last timestamp that was processed by the poller """
