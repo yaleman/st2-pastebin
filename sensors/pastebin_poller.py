@@ -87,7 +87,7 @@ class PasteBinPoller(PollingSensor):
                 # sort by timestamp, it comes in most-recent-first
                 data = sorted(jsondata, key=lambda k: k['date'])
                 for paste in data:
-                    self._logger.debug("time:{} key:{}".format(paste['date'], paste['key']))
+                    self._logger.debug("PastebinPoller: time:{} key:{}".format(paste['date'], paste['key']))
                     if paste['date'] > self._get_last_time():
                         # this is the timestamp of the last processed paste
                         self._set_last_time(last_time=paste['date'])
@@ -121,9 +121,11 @@ class PasteBinPoller(PollingSensor):
 
     def _set_last_time(self, last_time):
         """ stores the last timestamp seen by the thing """
+        self._logger.debug("PastebinPoller._set_last_time({}) start".format(last_time))
         self._last_time = last_time
         if hasattr(self._sensor_service, 'set_value'):
             self._sensor_service.set_value(name='last_time', value=last_time)
+        self._logger.debug("PastebinPoller._set_last_time({}) end".format(last_time))
 
 
     def cleanup(self):
