@@ -34,7 +34,7 @@ def request_get_versioned(url, ipversion):
 class PasteBinPoller(PollingSensor):
     """ regularly polls the pastebin scrape API endpoint and reports back new keys """
 
-    def __init__(self, sensor_service, config=None, poll_interval=5):
+    def __init__(self, sensor_service, config=None, poll_interval=None):
         """ sets up the thing """
         super(PasteBinPoller, self).__init__(sensor_service=sensor_service,
                                              config=config, 
@@ -50,8 +50,8 @@ class PasteBinPoller(PollingSensor):
     def setup(self):
         """ Setup stuff goes here. This is called only once by the system."""
         self._logger.debug("PastebinPoller.setup() start")
-        #self.set_poll_interval(self._config['poll_interval'])
-        #self._logger.debug('set poll interval to {}'.format(self._config['poll_interval']))
+        self.set_poll_interval(self._config['poll_interval'])
+        self._logger.debug('set poll interval to {}'.format(self._config['poll_interval']))
         self._logger.debug("PastebinPoller.setup() end")
 
     def poll(self):
