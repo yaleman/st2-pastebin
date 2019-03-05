@@ -43,14 +43,14 @@ class PasteBinPoller(PollingSensor):
         self._last_time = None
         self._url = "{}?limit={}".format(SCRAPE_URL, self._config['poll_maxresults'])
 
-	self._logger.debug("PastebinPoller.__init__() run")
+	self._logger.debug("PastebinPoller.__init__() done")
 
     def setup(self):
         """ Setup stuff goes here. This is called only once by the system."""
         self._logger.debug("PastebinPoller.setup() start")
-	self.set_poll_interval(self._config['poll_interval'])
+        self.set_poll_interval(self._config['poll_interval'])
         self._logger.debug('set poll interval to {}'.format(self._config['poll_interval']))
-	self._logger.debug("PastebinPoller.setup() end")
+        self._logger.debug("PastebinPoller.setup() end")
 
     def poll(self):
         """ does the polling action
@@ -64,7 +64,7 @@ class PasteBinPoller(PollingSensor):
                     'syntax' : str,
                 }
         """
-	self._logger.debug("PastebinPoller.poll() start")
+        self._logger.debug("PastebinPoller.poll() start")
         self.set_poll_interval(self._config['poll_interval'])
         self._logger.debug('set poll interval to {}'.format(self._config['poll_interval']))
         
@@ -109,7 +109,7 @@ class PasteBinPoller(PollingSensor):
         except Exception as error_message:
             self._logger.debug("Threw an error: {}".format(error_message))
             self._logger.debug(traceback.format_exc())
-	self._logger.debug("PastebinPoller.poll() end")
+        self._logger.debug("PastebinPoller.poll() end")
 
         return
 
