@@ -40,10 +40,11 @@ class PasteBinPoller(PollingSensor):
                                              config=config, poll_interval=poll_interval)
         self._trigger_ref = 'pastebin.new_paste'
         self._logger = self._sensor_service.get_logger(__name__)
-        self._last_time = None
+        self._logger.debug("PastebinPoller.__init__() start")
+        self._last_time = self._get_last_time()
         self._url = "{}?limit={}".format(SCRAPE_URL, self._config['poll_maxresults'])
+        self._logger.debug("PastebinPoller.__init__() done")
 
-	self._logger.debug("PastebinPoller.__init__() done")
 
     def setup(self):
         """ Setup stuff goes here. This is called only once by the system."""
@@ -87,7 +88,7 @@ class PasteBinPoller(PollingSensor):
                 # sort by timestamp, it comes in most-recent-first
                 data = sorted(jsondata, key=lambda k: k['date'])
                 for paste in data:
-                    self._logger.debug("PastebinPoller: time:{} key:{}".format(paste['date'], paste['key']))
+                    self._logger.debug("PastebinPoller found paste - time:{} key:{}".format(paste['date'], paste['key']))
                     if paste['date'] > self._get_last_time():
                         # this is the timestamp of the last processed paste
                         self._set_last_time(last_time=paste['date'])
