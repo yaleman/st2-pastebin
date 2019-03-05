@@ -38,3 +38,7 @@ Action ref: pastebin.scrape_paste_raw
 Action key: {{trigger.key}} 
 
 This'll grab every new paste and then the contents of it. It's a super simple example which shouldn't be used alone, but could be used for an [ActionChain](https://docs.stackstorm.com/actionchain.html) workflow to filter contents and generate alerts.
+
+# Changelog
+
+* 2019-03-05 merged in better IPv4/6 handling functionality, python version of scrape_paste_raw

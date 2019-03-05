@@ -47,6 +47,22 @@ class ScrapePasteRaw(Action):
             if req and not req.raise_for_status():
                 self.logger.debug("Got a response from the API")
                 
+                # TODO: fix this: 
+                """  "elapsed_seconds": 5.184091,
+  "web_url": "https://st2.housenet.yaleman.org/#/history/5c7e760852364c07a0828fc0/general",
+  "parent": "5c7e760652364c0577281375",
+  "result": {
+    "result": "'ascii' codec can't encode character u'\\xe4' in position 58: ordinal not in range(128)",
+    "exit_code": 0,
+    "stderr": "st2.actions.python.ScrapePasteRaw: DEBUG    Doing the request to https://scrape.pastebin.com/api_scrape_item.php?i=g1Uh1Pwe
+st2.actions.python.ScrapePasteRaw: DEBUG    Got a response from the API
+st2.actions.python.ScrapePasteRaw: DEBUG    Threw an error: 'ascii' codec can't encode character u'\\xe4' in position 58: ordinal not in range(128)
+st2.actions.python.ScrapePasteRaw: DEBUG    Traceback (most recent call last):
+  File \"/opt/stackstorm/packs/pastebin/actions/scrape_paste_raw.py\", line 50, in run
+    data = str(req.text)
+UnicodeEncodeError: 'ascii' codec can't encode character u'\\xe4' in position 58: ordinal not in range(128)
+"""
+                
                 data = str(req.text)
                 
                 if "VISIT: https://pastebin.com/doc_scraping_api TO GET ACCESS!" in data:
