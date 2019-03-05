@@ -33,18 +33,19 @@ def request_get_versioned(url, ipversion):
 
 class ScrapePasteRaw(Action):
     def run(self, key):
-        """ uploads a file from the local disk """
+        """ grabs a raw paste based on the key """
         try:
             # do the HTTP request
-            self.logger.debug("Doing the request to {}".format(self.url))
-            req = request_get_versioned(URL.format(key), self.config['ipversion'])
+            url = URL.format(key)
+            self.logger.debug("Doing the request to {}".format(url))
+            req = request_get_versioned(url, self.config['ipversion'])
 
             if req and not req.raise_for_status():
                 self.logger.debug("Got a response from the API")
                 
                 data = str(req.text())
                 
-                if "VISIT: https://pastebin.com/doc_scraping_api TO GET ACCESS!" in req.text:
+                if "VISIT: https://pastebin.com/doc_scraping_api TO GET ACCESS!" in data:
                     return (False,"Our source IP is not whitelisted.")
                 return (True, data)
             else:
