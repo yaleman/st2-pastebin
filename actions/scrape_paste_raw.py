@@ -2,7 +2,9 @@
 import traceback
 import socket
 
-import requests
+from requests import get
+import requests.packages.urllib3.util.connection as urllib3_cn
+
 
 if __name__ != '__main__':
     from st2common.content import utils
@@ -12,33 +14,35 @@ URL = 'https://scrape.pastebin.com/api_scrape_item.php?i={}'
 
 __all__ = ['ScrapePasteRaw',]
 
-old_getaddrinfo = socket.getaddrinfo
+"""
+fix from https://stackoverflow.com/questions/33046733/force-requests-to-use-ipv4-ipv6/46972341#46972341
+relates to https://github.com/shazow/urllib3/blob/master/urllib3/util/connection.py
+"""
+def allowed_gai_family_v4():
+    return socket.AF_INET
 
-def getaddrinfoIPv6(host, port, family=0, type=0, proto=0, flags=0):
-    """ monkeypatched getaddrinfo to force IPv6 """
-    return old_getaddrinfo(host, port, socket.AF_INET6, proto, flags)
-
-def getaddrinfoIPv4(host, port, family=0, type=0, proto=0, flags=0):
-    """ monkeypatched getaddrinfo to force IPv4 """
-    return old_getaddrinfo(host, port, socket.AF_INET, proto, flags)
-
-def request_get_versioned(url, ipversion):
-    """ does a request with different versions of socket.getaddrinfo - forces IPv4 or IPv6 """
-    # monkeypatching requests to work with ipv4 or ipv6 specifically
-    if ipversion == 6:
-        socket.getaddrinfo = getaddrinfoIPv6
-    else:
-        socket.getaddrinfo = getaddrinfoIPv4
-    return requests.get(url)
+def allowed_gai_family_v6():
+    return socket.AF_INET6
 
 class ScrapePasteRaw(Action):
     def run(self, key):
+
+        # rebind the IP Version thing
+        # pastebin only allows you to whitelist a single source IP and dual-stack randomly uses a different source IP 
+        if self._config['ipversion'] == 4:
+            urllib3_cn.allowed_gai_family = allowed_gai_family_v4
+        elif self._config['ipversion'] == 6:
+            urllib3_cn.allowed_gai_family = allowed_gai_family_v6
+        else:
+            self._logger.debug("No IP Version set in configuration")
+            return False
+
         """ grabs a raw paste based on the key """
         try:
             # do the HTTP request
             url = URL.format(key)
             self.logger.debug("Doing the request to {}".format(url))
-            req = request_get_versioned(url, self.config['ipversion'])
+            req = get(url, self.config['ipversion'])
 
             if req and not req.raise_for_status():
                 self.logger.debug("Got a response from the API")

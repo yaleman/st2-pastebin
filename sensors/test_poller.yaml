@@ -1,5 +1,0 @@
---- 
-class_name: TestPoller
-description: "testpoller"
-entry_point: test_poller.py
-
