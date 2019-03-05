@@ -117,7 +117,7 @@ class PasteBinPoller(PollingSensor):
     def _get_last_time(self):
         """ returns the last timestamp that was processed by the poller """
         self._logger.debug("PastebinPoller._get_last_time() start")
-        if (not self.hasattr(self, '_last_time') or not self._last_time) and hasattr(self._sensor_service, 'get_value'):
+        if (not hasattr(self, '_last_time') or not self._last_time) and hasattr(self._sensor_service, 'get_value'):
             self._last_time = self._sensor_service.get_value(name='last_time')
         self._logger.debug("PastebinPoller._get_last_time() end, returning {}".format(self._last_time))
         return self._last_time
