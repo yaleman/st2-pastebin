@@ -13,7 +13,7 @@ class TestPoller(PollingSensor):
     def __init__(self, sensor_service, config=None, poll_interval=None):
         """ sets up the thing """
         super(TestPoller, self).__init__(sensor_service=sensor_service,
-                                             config=config, poll_interval=poll_interval)
+                                             config=config, poll_interval=5)
         self._logger = self._sensor_service.get_logger(__name__)
         self._logger.debug("TEST LOGGING __init__() start")
 
