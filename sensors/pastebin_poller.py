@@ -29,7 +29,9 @@ def request_get_versioned(url, ipversion):
         socket.getaddrinfo = getaddrinfoIPv6
     else:
         socket.getaddrinfo = getaddrinfoIPv4
-    return requests_get(url)
+    req = requests_get(url)
+    socketgetaddrinfo = old_getaddrinfo
+    return req
 
 class PasteBinPoller(PollingSensor):
     """ regularly polls the pastebin scrape API endpoint and reports back new keys """
@@ -76,8 +78,7 @@ class PasteBinPoller(PollingSensor):
             
             # do the HTTP request
             self._logger.debug("Doing the request to {}".format(self._url))
-            req = None
-            #req = request_get_versioned(self._url, self._config['ipversion'])
+            req = request_get_versioned(self._url, self._config['ipversion'])
 
             if req and not req.raise_for_status():
                 self._logger.debug("Got a response from the API")
