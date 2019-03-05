@@ -36,8 +36,8 @@ class ScrapePasteRaw(Action):
         """ uploads a file from the local disk """
         try:
             # do the HTTP request
-            self.logger.debug("Doing the request to {}".format(self._url))
-            req = request_get_versioned(URL.format(key), self._config['ipversion'])
+            self.logger.debug("Doing the request to {}".format(self.url))
+            req = request_get_versioned(URL.format(key), self.config['ipversion'])
 
             if req and not req.raise_for_status():
                 self.logger.debug("Got a response from the API")
@@ -46,9 +46,10 @@ class ScrapePasteRaw(Action):
                 
                 if "VISIT: https://pastebin.com/doc_scraping_api TO GET ACCESS!" in req.text:
                     return (False,"Our source IP is not whitelisted.")
+                return (True, data)
             else:
                 return (False, "No response from the API (status_code: {})".format(req.status_code))
         except Exception as error_message:
             self.logger.debug("Threw an error: {}".format(error_message))
             self.logger.debug(traceback.format_exc())
-        return (True, data)
+            return (False, error_message)
