@@ -37,7 +37,7 @@ import socket
 import requests.packages.urllib3.util.connection as urllib3_cn
 
 
-  def allowed_gai_family():
+def allowed_gai_family():
     """
     fix from https://stackoverflow.com/questions/33046733/force-requests-to-use-ipv4-ipv6/46972341#46972341
     relates to https://github.com/shazow/urllib3/blob/master/urllib3/util/connection.py
@@ -46,7 +46,7 @@ import requests.packages.urllib3.util.connection as urllib3_cn
     #if urllib3_cn.HAS_IPV6:
     #    family = socket.AF_INET6 # force ipv6 only if it is available
     return socket.AF_INET
-    return family
+    #return family
 
 urllib3_cn.allowed_gai_family = allowed_gai_family
 
