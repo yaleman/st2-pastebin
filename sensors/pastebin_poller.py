@@ -34,7 +34,7 @@ def request_get_versioned(url, ipversion):
 class PasteBinPoller(PollingSensor):
     """ regularly polls the pastebin scrape API endpoint and reports back new keys """
 
-    def __init__(self, sensor_service, config=None, poll_interval=None):
+    def __init__(self, sensor_service, config=None, poll_interval=5):
         """ sets up the thing """
         super(PasteBinPoller, self).__init__(sensor_service=sensor_service,
                                              config=config, 
