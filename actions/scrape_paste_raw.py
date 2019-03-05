@@ -25,13 +25,13 @@ def allowed_gai_family_v6():
     return socket.AF_INET6
 
 class ScrapePasteRaw(Action):
-    def run(self, key):
 
+    def run(self, key):
         # rebind the IP Version thing
         # pastebin only allows you to whitelist a single source IP and dual-stack randomly uses a different source IP 
-        if self._config['ipversion'] == 4:
+        if self.config['ipversion'] == 4:
             urllib3_cn.allowed_gai_family = allowed_gai_family_v4
-        elif self._config['ipversion'] == 6:
+        elif self.config['ipversion'] == 6:
             urllib3_cn.allowed_gai_family = allowed_gai_family_v6
         else:
             self._logger.debug("No IP Version set in configuration")
