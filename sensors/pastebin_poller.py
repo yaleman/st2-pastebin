@@ -16,11 +16,11 @@ old_getaddrinfo = socket.getaddrinfo
 
 def getaddrinfoIPv6(host, port, family=0, type=0, proto=0, flags=0):
     """ monkeypatched getaddrinfo to force IPv6 """
-    return old_getaddrinfo(host=host, port=port, family=socket.AF_INET6, proto=proto, flags=flags)
+    return old_getaddrinfo(host, port, socket.AF_INET6, proto, flags)
 
 def getaddrinfoIPv4(host, port, family=0, type=0, proto=0, flags=0):
     """ monkeypatched getaddrinfo to force IPv4 """
-    return old_getaddrinfo(host=host, port=port, family=socket.AF_INET, proto=proto, flags=flags)
+    return old_getaddrinfo(host, port, socket.AF_INET, proto, flags)
 
 def request_get_versioned(url, ipversion):
     """ does a request with different versions of socket.getaddrinfo - forces IPv4 or IPv6 """
@@ -30,7 +30,6 @@ def request_get_versioned(url, ipversion):
     else:
         socket.getaddrinfo = getaddrinfoIPv4
     return requests.get(url)
-
 
 class PasteBinPoller(PollingSensor):
     """ regularly polls the pastebin scrape API endpoint and reports back new keys """
