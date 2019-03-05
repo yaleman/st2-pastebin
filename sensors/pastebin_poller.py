@@ -4,6 +4,7 @@
 from traceback import format_exc
 import socket
 
+import requests.packages.urllib3.util.connection as urllib3_cn
 from requests import get as requests_get
 
 from st2reactor.sensor.base import PollingSensor
@@ -12,43 +13,15 @@ __all__ = ['PasteBinPoller',]
 
 SCRAPE_URL = 'https://scrape.pastebin.com/api_scraping.php'
 
-old_getaddrinfo = socket.getaddrinfo
 
-def getaddrinfoIPv6(host, port, family=0, type=0, proto=0, flags=0):
-    """ monkeypatched getaddrinfo to force IPv6 """
-    return old_getaddrinfo(host, port, socket.AF_INET6, proto, flags)
-
-def getaddrinfoIPv4(host, port, family=0, type=0, proto=0, flags=0):
-    """ monkeypatched getaddrinfo to force IPv4 """
-    return old_getaddrinfo(host, port, socket.AF_INET, proto, flags)
-
-def request_get_versioned(url, ipversion):
-    """ does a request with different versions of socket.getaddrinfo - forces IPv4 or IPv6 """
-    # monkeypatching requests to work with ipv4 or ipv6 specifically
-    if ipversion == 6:
-        socket.getaddrinfo = getaddrinfoIPv6
-    else:
-        socket.getaddrinfo = getaddrinfoIPv4
-    req = requests_get(url)
-    socketgetaddrinfo = old_getaddrinfo
-    return req
-
-import socket
-import requests.packages.urllib3.util.connection as urllib3_cn
-
-
+"""
+fix from https://stackoverflow.com/questions/33046733/force-requests-to-use-ipv4-ipv6/46972341#46972341
+relates to https://github.com/shazow/urllib3/blob/master/urllib3/util/connection.py
+"""
 def allowed_gai_family_v4():
-    """
-    fix from https://stackoverflow.com/questions/33046733/force-requests-to-use-ipv4-ipv6/46972341#46972341
-    relates to https://github.com/shazow/urllib3/blob/master/urllib3/util/connection.py
-    """
     return socket.AF_INET
 
 def allowed_gai_family_v6():
-    """
-    fix from https://stackoverflow.com/questions/33046733/force-requests-to-use-ipv4-ipv6/46972341#46972341
-    relates to https://github.com/shazow/urllib3/blob/master/urllib3/util/connection.py
-    """
     return socket.AF_INET6
 
 
@@ -76,7 +49,8 @@ class PasteBinPoller(PollingSensor):
         self.set_poll_interval(poll_interval)
         self._logger.debug('set poll interval to {}'.format(poll_interval))
 
-
+        # rebind the IP Version thing
+        # pastebin only allows you to whitelist a single source IP and dual-stack randomly uses a different source IP 
         if self._config['ipversion'] == 4:
             urllib3_cn.allowed_gai_family = allowed_gai_family_v4
         elif self._config['ipversion'] == 6:
@@ -84,6 +58,8 @@ class PasteBinPoller(PollingSensor):
         else:
             self._logger.debug("No IP Version set in configuration")
             return False
+        # end rebind the IP Version thing
+        
         self._logger.debug("PastebinPoller.setup() end")
 
     def poll(self):
@@ -111,36 +87,37 @@ class PasteBinPoller(PollingSensor):
 
             if req and not req.raise_for_status():
                 self._logger.debug("Got a response from the API")
-            #        try:
-            #            jsondata = req.json()
-            #        except TypeError:
-            #            self._logger.debug("JSON Decode failed, stopping. Probably not running from a whitelisted IP")
-            #            return
-            #        if "VISIT: https://pastebin.com/doc_scraping_api TO GET ACCESS!" in req.text:
-            #            self._logger.debug("Our source IP is not whitelisted, stoppping.")
-            #            return
-            #        # sort by timestamp, it comes in most-recent-first
-            #        data = sorted(jsondata, key=lambda k: k['date'])
-            #        for paste in data:
-            #            self._logger.debug("PastebinPoller found paste - time:{} key:{}".format(paste['date'], paste['key']))
-            #            if paste['date'] > self._get_last_time():
-            #                # this is the timestamp of the last processed paste
-            #                self._set_last_time(last_time=paste['date'])
-            #                # do the thing
-            #                payload = {'date' : int(paste['date']), 
-            #                            'key' : paste['key'],
-            #                            'size' : int(paste['size']),
-            #                            'user' : paste['user'],
-            #                            'title' : paste['title'],
-            #                            'syntax' : paste['syntax'],
-            #                            }
-            #                self._logger.debug("Trigger running...")
-            #                self._sensor_service.dispatch(trigger=self._trigger_ref, payload=payload)
-            #                self._logger.debug("Trigger done.")
-            #            else:
-            #                self._logger.debug("Skipping paste {} {}".format(paste['key'], paste['date']))
-            #    else:
-            #        self._logger.debug("No response from the API (status_code: {})".format(req.status_code))
+                try:
+                    jsondata = req.json()
+                except TypeError:
+                    self._logger.debug("JSON Decode failed, stopping. Probably not running from a whitelisted IP")
+                    return
+                if "VISIT: https://pastebin.com/doc_scraping_api TO GET ACCESS!" in req.text:
+                    self._logger.debug("Our source IP is not whitelisted, stoppping.")
+                    return
+                # sort by timestamp, it comes in most-recent-first
+                data = sorted(jsondata, key=lambda k: k['date'])
+                for paste in data:
+                    self._logger.debug("PastebinPoller found paste - time:{} key:{}".format(paste['date'], paste['key']))
+                    if paste['date'] > self._get_last_time():
+                        # this is the timestamp of the last processed paste
+                        self._set_last_time(last_time=paste['date'])
+                        # do the thing
+                        payload = {'date' : int(paste['date']), 
+                                   'key' : paste['key'],
+                                   'size' : int(paste['size']),
+                                   'user' : paste['user'],
+                                   'title' : paste['title'],
+                                   'syntax' : paste['syntax'],
+                                   }
+                        self._logger.debug("Trigger running...")
+                        self._sensor_service.dispatch(trigger=self._trigger_ref, payload=payload)
+                        self._logger.debug("Trigger done.")
+                    else:
+                        self._logger.debug("Skipping paste {} {}".format(paste['key'], paste['date']))
+            else:
+                self._logger.debug("No response from the API (status_code: {})".format(req.status_code))
+                return
         except Exception as error_message:
                 self._logger.debug("Threw an error: {}".format(error_message))
                 self._logger.debug(format_exc())
