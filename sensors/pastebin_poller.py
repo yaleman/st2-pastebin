@@ -9,6 +9,11 @@ from requests import get as requests_get
 
 from st2reactor.sensor.base import PollingSensor
 
+try:
+    from json.decoder import JSONDecodeError
+except ImportError:
+    JSONDecodeError = ValueError
+
 __all__ = ['PasteBinPoller',]
 
 SCRAPE_URL = 'https://scrape.pastebin.com/api_scraping.php'
@@ -89,9 +94,13 @@ class PasteBinPoller(PollingSensor):
                 self._logger.debug("Got a response from the API")
                 try:
                     jsondata = req.json()
+                except JSONDecodeError:
+                    self._logger.debug("JSON Decode failed, stopping. Probably not running from a whitelisted IP")
+                    return
                 except TypeError:
                     self._logger.debug("JSON Decode failed, stopping. Probably not running from a whitelisted IP")
                     return
+
                 if "VISIT: https://pastebin.com/doc_scraping_api TO GET ACCESS!" in req.text:
                     self._logger.debug("Our source IP is not whitelisted, stoppping.")
                     return
