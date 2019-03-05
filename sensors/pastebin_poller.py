@@ -50,8 +50,10 @@ class PasteBinPoller(PollingSensor):
     def setup(self):
         """ Setup stuff goes here. This is called only once by the system."""
         self._logger.debug("PastebinPoller.setup() start")
-        self.set_poll_interval(self._config['poll_interval'])
-        self._logger.debug('set poll interval to {}'.format(self._config['poll_interval']))
+        poll_interval = self._config['poll_interval']
+        self._logger.debug("Config poll interval: {}".format(poll_interval))
+        self.set_poll_interval(poll_interval)
+        self._logger.debug('set poll interval to {}'.format(poll_interval))
         self._logger.debug("PastebinPoller.setup() end")
 
     def poll(self):
