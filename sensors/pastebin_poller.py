@@ -76,7 +76,8 @@ class PasteBinPoller(PollingSensor):
             
             # do the HTTP request
             self._logger.debug("Doing the request to {}".format(self._url))
-            req = request_get_versioned(self._url, self._config['ipversion'])
+            req = None
+            #req = request_get_versioned(self._url, self._config['ipversion'])
 
             if req and not req.raise_for_status():
                 self._logger.debug("Got a response from the API")
