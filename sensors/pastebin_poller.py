@@ -37,18 +37,20 @@ import socket
 import requests.packages.urllib3.util.connection as urllib3_cn
 
 
-def allowed_gai_family():
+def allowed_gai_family_v4():
     """
     fix from https://stackoverflow.com/questions/33046733/force-requests-to-use-ipv4-ipv6/46972341#46972341
     relates to https://github.com/shazow/urllib3/blob/master/urllib3/util/connection.py
     """
-    #family = socket.AF_INET
-    #if urllib3_cn.HAS_IPV6:
-    #    family = socket.AF_INET6 # force ipv6 only if it is available
     return socket.AF_INET
-    #return family
 
-urllib3_cn.allowed_gai_family = allowed_gai_family
+def allowed_gai_family_v6():
+    """
+    fix from https://stackoverflow.com/questions/33046733/force-requests-to-use-ipv4-ipv6/46972341#46972341
+    relates to https://github.com/shazow/urllib3/blob/master/urllib3/util/connection.py
+    """
+    return socket.AF_INET6
+
 
 class PasteBinPoller(PollingSensor):
     """ regularly polls the pastebin scrape API endpoint and reports back new keys """
@@ -73,6 +75,15 @@ class PasteBinPoller(PollingSensor):
         self._logger.debug("Config poll interval: {}".format(poll_interval))
         self.set_poll_interval(poll_interval)
         self._logger.debug('set poll interval to {}'.format(poll_interval))
+
+
+        if self._config['ipversion'] == 4:
+            urllib3_cn.allowed_gai_family = allowed_gai_family_v4
+        elif self._config['ipversion'] == 6:
+            urllib3_cn.allowed_gai_family = allowed_gai_family_v6
+        else:
+            self._logger.debug("No IP Version set in configuration")
+            return False
         self._logger.debug("PastebinPoller.setup() end")
 
     def poll(self):
