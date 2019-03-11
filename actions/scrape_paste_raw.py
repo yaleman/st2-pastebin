@@ -63,7 +63,7 @@ st2.actions.python.ScrapePasteRaw: DEBUG    Traceback (most recent call last):
 UnicodeEncodeError: 'ascii' codec can't encode character u'\\xe4' in position 58: ordinal not in range(128)
 """
                 
-                data = str(req.text)
+                data = req.text.encode('utf-8')
                 
                 if "VISIT: https://pastebin.com/doc_scraping_api TO GET ACCESS!" in data:
                     return (False,"Our source IP is not whitelisted.")
