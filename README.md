@@ -43,3 +43,4 @@ This'll grab every new paste and then the contents of it. It's a super simple ex
 
 * 2019-03-05 merged in better IPv4/6 handling functionality, python version of scrape_paste_raw
 * 2019-03-12 changed scrape_paste_raw to handle unicode better - was failing on unicode strings
+* 2019-03-13 added a little troubleshooting for unicode errors - watch out for error files in /tmp/

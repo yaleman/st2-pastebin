@@ -35,7 +35,7 @@ class ScrapePasteRaw(Action):
             urllib3_cn.allowed_gai_family = allowed_gai_family_v6
         else:
             self._logger.debug("No IP Version set in configuration")
-            return False
+            return (False, "No IP Version set in configuration")
 
         """ grabs a raw paste based on the key """
         try:
@@ -47,23 +47,13 @@ class ScrapePasteRaw(Action):
             if req and not req.raise_for_status():
                 self.logger.debug("Got a response from the API")
                 
-                # TODO: fix this: 
-                """  "elapsed_seconds": 5.184091,
-  "web_url": "https://st2.housenet.yaleman.org/#/history/5c7e760852364c07a0828fc0/general",
-  "parent": "5c7e760652364c0577281375",
-  "result": {
-    "result": "'ascii' codec can't encode character u'\\xe4' in position 58: ordinal not in range(128)",
-    "exit_code": 0,
-    "stderr": "st2.actions.python.ScrapePasteRaw: DEBUG    Doing the request to https://scrape.pastebin.com/api_scrape_item.php?i=g1Uh1Pwe
-st2.actions.python.ScrapePasteRaw: DEBUG    Got a response from the API
-st2.actions.python.ScrapePasteRaw: DEBUG    Threw an error: 'ascii' codec can't encode character u'\\xe4' in position 58: ordinal not in range(128)
-st2.actions.python.ScrapePasteRaw: DEBUG    Traceback (most recent call last):
-  File \"/opt/stackstorm/packs/pastebin/actions/scrape_paste_raw.py\", line 50, in run
-    data = str(req.text)
-UnicodeEncodeError: 'ascii' codec can't encode character u'\\xe4' in position 58: ordinal not in range(128)
-"""
-                
-                data = req.text.encode('utf-8')
+                try:
+                    data = req.text.encode('utf-8')
+                except UnicodeDecodeError:
+                    errorfile = '/tmp/unicodefail-{}.txt'.format(key)
+                    with open(errorfile, 'w') as fh:
+                        fh.write(req.text)
+                    return (False, "Couldn't decode unicode data, wrote temp file to {}".format(errorfile))
                 
                 if "VISIT: https://pastebin.com/doc_scraping_api TO GET ACCESS!" in data:
                     return (False,"Our source IP is not whitelisted.")
@@ -74,3 +64,4 @@ UnicodeEncodeError: 'ascii' codec can't encode character u'\\xe4' in position 58
             self.logger.debug("Threw an error: {}".format(error_message))
             self.logger.debug(traceback.format_exc())
             return (False, error_message)
+        return (False, "Got to here, shouldn't be able to do that...")
