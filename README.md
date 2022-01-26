@@ -1,3 +1,5 @@
+⚠️ THIS IS ARCHIVED AND WILL NOT BE UPDATED ⚠️
+
 # Pastebin pack for stackstorm
 
 **Polling Sensor pastebin.PasteBinPoller**
